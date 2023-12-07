@@ -20,7 +20,7 @@ def generate_report_prompt(question, context, report_format="apa", total_words=2
     """
 
     return f'Do not forget this is for Korean reader, thus to wrte in Korean. Information: """{context}"""\n\n' \
-           f'Using the above information, answer the following' \
+           f'Using the above information, answer the following and always include the latest stock price' \
            f' query or task: "{question}" in a detailed report --' \
            " The report should focus on the answer to the query, should be well structured, informative," \
            f" in depth and comprehensive, with facts and numbers if available and a minimum of {total_words} words.\n" \

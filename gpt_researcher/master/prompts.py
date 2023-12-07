@@ -19,12 +19,12 @@ def generate_report_prompt(question, context, report_format="apa", total_words=2
     Returns: str: The report prompt for the given question and research summary
     """
 
-    return f'Information: """{context}"""\n\n' \
+    return f'Do not forget this is for Korean reader, thus to wrte in Korean. Information: """{context}"""\n\n' \
            f'Using the above information, answer the following' \
            f' query or task: "{question}" in a detailed report --' \
            " The report should focus on the answer to the query, should be well structured, informative," \
            f" in depth and comprehensive, with facts and numbers if available and a minimum of {total_words} words.\n" \
-           "You are writing the report for Korean investor readers, thus to translate into Korean while possible to engage with them casually.\n" \
+           "You are writing the report for Korean investor readers,it is possible to engage with them casually.\n" \
            "That's because korean investors are accustomed to talking of their investments in community like reddit.\n" \
            "You should strive to write the report as long as you can using all relevant and necessary information provided.\n" \
            "You must write the report with markdown syntax.\n " \

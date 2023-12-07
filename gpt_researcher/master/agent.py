@@ -3,7 +3,8 @@ from gpt_researcher.config import Config
 from gpt_researcher.master.functions import *
 from gpt_researcher.context.compression import ContextCompressor
 from gpt_researcher.memory import Memory
-
+import yfinance as yf
+from datetime import datetime, timedelta
 
 class GPTResearcher:
     """
@@ -53,6 +54,10 @@ class GPTResearcher:
             context = await self.get_similar_content_by_query(sub_query, scraped_sites)
             await stream_output("logs", f"📃 {context}", self.websocket)
             self.context.append(context)
+            # Insert current stock data
+        
+        stock_data = yf.download("005930.KS", start="2023-01-01", end=datetime.today())
+        self.context.append(stock_data)
         # Conduct Research
         await stream_output("logs", f"✍️ Writing {self.report_type} for research task: {self.query}...", self.websocket)
         report = await generate_report(query=self.query, context=self.context,

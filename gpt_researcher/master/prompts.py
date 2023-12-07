@@ -1,7 +1,7 @@
 from datetime import datetime
 
 
-def generate_search_queries_prompt(question, max_iterations=3):
+def generate_search_queries_prompt(question, max_iterations=5):
     """ Generates the search queries prompt for the given question.
     Args: question (str): The question to generate the search queries prompt for
     Returns: str: The search queries prompt for the given question
@@ -12,7 +12,7 @@ def generate_search_queries_prompt(question, max_iterations=3):
            f'You must respond with a list of strings in the following format: ["query 1", "query 2", "query 3"].'
 
 
-def generate_report_prompt(question, context, report_format="apa", total_words=1000):
+def generate_report_prompt(question, context, report_format="apa", total_words=2000):
     """ Generates the report prompt for the given question and research summary.
     Args: question (str): The question to generate the report prompt for
             research_summary (str): The research summary to generate the report prompt for
@@ -24,10 +24,13 @@ def generate_report_prompt(question, context, report_format="apa", total_words=1
            f' query or task: "{question}" in a detailed report --' \
            " The report should focus on the answer to the query, should be well structured, informative," \
            f" in depth and comprehensive, with facts and numbers if available and a minimum of {total_words} words.\n" \
+           "You are writing the report for Korean investor readers, thus to translate into Korean while possible to engage with them casually.\n" \
+           "That's because korean investors are accustomed to talking of their investments in community like reddit.\n" \
            "You should strive to write the report as long as you can using all relevant and necessary information provided.\n" \
            "You must write the report with markdown syntax.\n " \
-           f"Use an unbiased and journalistic tone. \n" \
-           "You MUST determine your own concrete and valid opinion based on the given information. Do NOT deter to general and meaningless conclusions.\n" \
+           f" \n" \
+           "You MUST determine your own concrete and valid opinion based on the given information. \
+            Do NOT deter to general and meaningless conclusions.\n" \
            f"You MUST write all used source urls at the end of the report as references, and make sure to not add duplicated sources, but only one reference for each.\n" \
            f"You MUST write the report in {report_format} format.\n " \
             f"Cite search results using inline notations. Only cite the most \
@@ -35,7 +38,7 @@ def generate_report_prompt(question, context, report_format="apa", total_words=1
             of the sentence or paragraph that reference them.\n"\
             f"Please do your best, this is very important to my career. " \
             f"Assume that the current date is {datetime.now().strftime('%B %d, %Y')}"
-
+#Use an unbiased and journalistic tone.
 
 def generate_resource_report_prompt(question, context, report_format="apa", total_words=1000):
     """Generates the resource report prompt for the given question and research summary.
@@ -90,7 +93,10 @@ def auto_agent_instructions():
         response: 
         {
             "server": "💰 Finance Agent",
-            "agent_role_prompt: "You are a seasoned finance analyst AI assistant. Your primary goal is to compose comprehensive, astute, impartial, and methodically arranged financial reports based on provided data and trends."
+            "agent_role_prompt: "You are a seasoned finance analyst AI assistant speicalized in writing sell ratings report.\
+                  That is you are good at pinpointing in negative aspect of financial instruments asked by user\
+                    Your primary goal is to compose comprehensive, astute, and methodically arranged financial reports \
+                    based on provided data and trends."
         }
         task: "could reselling sneakers become profitable?"
         response: 

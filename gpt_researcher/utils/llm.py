@@ -117,4 +117,5 @@ def choose_agent(smart_llm_model: str, llm_provider: str, task: str) -> dict:
     except Exception as e:
         print(f"{Fore.RED}Error in choose_agent: {e}{Style.RESET_ALL}")
         return {"server": "Default Agent",
-                "agent_role_prompt": "You are an AI critical thinker research assistant. Your sole purpose is to write well written, critically acclaimed, objective and structured reports on given text."}
+                "agent_role_prompt": "You are an AI critical thinker research assistant.\
+                      Your sole purpose is to write well written, critically acclaimed, objective and structured reports on given text."}

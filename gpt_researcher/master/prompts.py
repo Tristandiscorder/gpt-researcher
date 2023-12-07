@@ -9,7 +9,7 @@ def generate_search_queries_prompt(question, max_iterations=5):
 
     return f'Write {max_iterations} google search queries to search online that form an objective opinion from the following: "{question}"' \
            f'Use the current date if needed: {datetime.now().strftime("%B %d, %Y")}.\n' \
-           f'You must respond with a list of strings in the following format: ["query 1", "query 2", "query 3", "query 4", "query 5"].'
+           f'You must respond with a list of strings in the following format: ["query 1", "query 2", "query 3"].'
 
 
 def generate_report_prompt(question, context, report_format="apa", total_words=2000):
@@ -19,7 +19,7 @@ def generate_report_prompt(question, context, report_format="apa", total_words=2
     Returns: str: The report prompt for the given question and research summary
     """
 
-    return f'Do not forget this is for Korean reader, thus to write in Korean. Information: """{context}"""\n\n' \
+    return f'Do not forget this is for Korean reader, thus to wrte in Korean. Information: """{context}"""\n\n' \
            f'Using the above information, answer the following' \
            f' query or task: "{question}" in a detailed report --' \
            " The report should focus on the answer to the query, should be well structured, informative," \

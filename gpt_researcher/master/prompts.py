@@ -24,7 +24,7 @@ def generate_report_prompt(question, context, report_format="apa", total_words=2
            f' query or task: "{question}" in a detailed report --' \
            " The report should focus on the answer to the query, should be well structured, informative," \
            f" in depth and comprehensive, with facts and numbers if available and a minimum of {total_words} words.\n" \
-           "You are writing the report for Korean investor readers,it is possible to engage with them casually.\n" \
+           "It is possible to engage with them EXTREMELY casually, using BANMAL as if talking to students or your kids.\n" \
            "That's because korean investors are accustomed to talking of their investments in community like reddit.\n" \
            "You should strive to write the report as long as you can using all relevant and necessary information provided.\n" \
            "You must write the report with markdown syntax.\n " \

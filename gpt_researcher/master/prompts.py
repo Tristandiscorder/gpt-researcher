@@ -19,11 +19,12 @@ def generate_report_prompt(question, context, report_format="apa", total_words=2
     Returns: str: The report prompt for the given question and research summary
     """
 
-    return f'Do not forget this is for Korean reader, thus to write in Korean. Information: """{context}"""\n\n' \
-           f'Using the above information, answer the following and always include Yahoo finance latest stock price, \
+    return f'Do not forget this is for KOREAN reader, thus to write in KOREAN!. \
+           "It is possible to use BANMAL! as if talking to students or your kids.\n" \
+           "Because korean investors are accustomed to talking of their investments in community like reddit."\
+           Information: """{context}"""\n\n' \
+           f'Using the above information, answer the following and always include data excerpted from yahoo finance latest stock price, \
            its performance over the late 3month, 6months and over the current year 2023' \
-           "It is possible to engage with them EXTREMELY casually, using BANMAL! as if talking to students or your kids.\n" \
-           "That's because korean investors are accustomed to talking of their investments in community like reddit.\n" \
            f' query or task: "{question}" in a detailed report --' \
            " The report should focus on the answer to the query, should be well structured, informative," \
            f" in depth and comprehensive, with facts and numbers if available and a minimum of {total_words} words.\n" \

@@ -6,12 +6,14 @@ import json
 import os
 from gpt_researcher.utils.websocket_manager import WebSocketManager
 from .utils import write_md_to_pdf
+from typing import List
 
 
 class ResearchRequest(BaseModel):
     task: str
     report_type: str
     agent: str
+    pdf1: List[bytes]
 
 
 app = FastAPI()
@@ -41,14 +43,20 @@ async def websocket_endpoint(websocket: WebSocket):
     await manager.connect(websocket)
     try:
         while True:
-            data = await websocket.receive_text()
+            data = await websocket.receive_json(mode="binary") 
             if data.startswith("start"):
                 json_data = json.loads(data[6:])
-                task = json_data.get("task")
-                pdf1 = json_data
-                report_type = json_data.get("report_type")
+                
+                research_request = ResearchRequest(**json_data)
+                task = research_request.task
+                pdf1 = research_request.pdf1  # pdf1 as binary data
+                report_type = research_request.report_type
+                ################before declaring pdf1
+                #task = json_data.get("task")
+                #pdf1 = data.get("pdf1")  # Get pdf1 as binary data
+                #report_type = json_data.get("report_type")
                 if task and report_type:
-                    report = await manager.start_streaming(task, report_type, websocket)
+                    report = await manager.start_streaming(task, pdf1, report_type, websocket)
                     path = await write_md_to_pdf(report)
                     await websocket.send_json({"type": "path", "output": path})
                 else:

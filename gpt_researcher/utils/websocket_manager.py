@@ -46,7 +46,7 @@ class WebSocketManager:
             del self.sender_tasks[websocket]
             del self.message_queues[websocket]
 
-    async def start_streaming(self, pdf1, task, report_type, websocket):
+    async def start_streaming(self,  task, pdf1, report_type, websocket):
         """Start streaming the output."""
         report = await run_agent(task, pdf1, report_type, websocket)
         return report

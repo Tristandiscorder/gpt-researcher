@@ -22,7 +22,20 @@ const GPTResearcher = (() => {
       const ws_uri = `${protocol === 'https:' ? 'wss:' : 'ws:'}//${host}${pathname}ws`;
       const converter = new showdown.Converter();
       const socket = new WebSocket(ws_uri);
-  
+      
+      const readFileAsBinary = (file) => {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            const binaryData = new Uint8Array(event.target.result);
+            resolve(binaryData);
+          };
+          reader.onerror = (event) => {
+            reject(event.target.error);
+          };
+          reader.readAsArrayBuffer(file);
+        });
+      };
       socket.onmessage = (event) => {
         const data = JSON.parse(event.data);
         if (data.type === 'logs') {
@@ -38,17 +51,15 @@ const GPTResearcher = (() => {
   
       socket.onopen = (event) => {
         const task = document.querySelector('input[name="task"]').value;
-        const pdf1 = document.querySelector('input[name="pdf1"]').files; // 파일을 변수에 저장
-        const pdf2 = document.querySelector('input[name="pdf2"]').files; 
-        const pdf3 = document.querySelector('input[name="pdf3"]').files; 
+        const pdf1 = document.querySelector('input[name="pdf1"]').files; // 파일을 변수에 저장 
         const report_type = document.querySelector('select[name="report_type"]').value;
         const agent = document.querySelector('input[name="agent"]:checked').value;
-  
+        const pdf1Data = await Promise.all(Array.from(pdf1).map((file) => readFileAsBinary(file))); 
+        // Encode each file as binary data
+
         const requestData = {
           task: task,
-          pdf1: pdf1,
-          pdf2: pdf2,
-          pdf3: pdf3,
+          pdf1: pdf1Data,
           report_type: report_type,
           agent: agent,
         };
@@ -153,4 +164,5 @@ const GPTResearcher = (() => {
       startResearch,
       copyToClipboard,
     };
+    
   })();

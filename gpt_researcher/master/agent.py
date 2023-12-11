@@ -10,7 +10,7 @@ class GPTResearcher:
     """
     GPT Researcher
     """
-    def __init__(self, query, report_type, config_path=None, websocket=None):
+    def __init__(self, query,pdf1, report_type, config_path=None, websocket=None):
         """
         Initialize the GPT Researcher class.
         Args:
@@ -20,6 +20,7 @@ class GPTResearcher:
             websocket:
         """
         self.query = query
+        self.pdf1 = pdf1
         self.agent = None
         self.role = None
         self.report_type = report_type

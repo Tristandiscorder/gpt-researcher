@@ -50,13 +50,13 @@ const GPTResearcher = (() => {
       };
   
       socket.onopen = (event) => {
+        (async () => {
         const task = document.querySelector('input[name="task"]').value;
         const pdf1 = document.querySelector('input[name="pdf1"]').files; // 파일을 변수에 저장 
         const report_type = document.querySelector('select[name="report_type"]').value;
         const agent = document.querySelector('input[name="agent"]:checked').value;
         const pdf1Data = await Promise.all(Array.from(pdf1).map((file) => readFileAsBinary(file))); 
-        // Encode each file as binary data
-
+        
         const requestData = {
           task: task,
           pdf1: pdf1Data,
@@ -65,6 +65,8 @@ const GPTResearcher = (() => {
         };
   
         socket.send(`start ${JSON.stringify(requestData)}`);
+      })();
+      
       };
     };
   

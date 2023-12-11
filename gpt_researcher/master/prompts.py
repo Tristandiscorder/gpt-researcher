@@ -20,13 +20,13 @@ def generate_report_prompt(question, context, report_format="apa", total_words=2
     """
 
     return f'Do not forget this is for KOREAN reader, thus to write in KOREAN!. \
-           "Use BANMAL! as if talking to students or your kids.\n" \
+           "It is possible to use BANMAL! as if talking to students or your kids.\n" \
            "Because korean investors are accustomed to talking of their investments in community like reddit."\
            Information: """{context}"""\n\n' \
            f'Using the above information, answer the following and always include data excerpted from yahoo finance latest stock price, \
            its performance over the late 3month, 6months and over the current year 2023' \
            f' query or task: "{question}" in a detailed report --' \
-           " The report should focus on the answer to the query, should be well structured, informative, but casually using banmal" \
+           " The report should focus on the answer to the query, should be well structured, informative," \
            f" in depth and comprehensive, with facts and numbers if available and a minimum of {total_words} words.\n" \
            "You should strive to write the report as long as you can using all relevant and necessary information provided.\n" \
            "You must write the report with markdown syntax.\n " \

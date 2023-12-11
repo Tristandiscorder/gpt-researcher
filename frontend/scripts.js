@@ -38,11 +38,17 @@ const GPTResearcher = (() => {
   
       socket.onopen = (event) => {
         const task = document.querySelector('input[name="task"]').value;
+        const pdf1 = document.querySelector('input[name="pdf1"]').files; // 파일을 변수에 저장
+        const pdf2 = document.querySelector('input[name="pdf2"]').files; 
+        const pdf3 = document.querySelector('input[name="pdf3"]').files; 
         const report_type = document.querySelector('select[name="report_type"]').value;
         const agent = document.querySelector('input[name="agent"]:checked').value;
   
         const requestData = {
           task: task,
+          pdf1: pdf1,
+          pdf2: pdf2,
+          pdf3: pdf3,
           report_type: report_type,
           agent: agent,
         };

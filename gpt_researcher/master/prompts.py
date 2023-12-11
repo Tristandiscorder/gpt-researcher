@@ -40,7 +40,7 @@ def generate_report_prompt(question, context, report_format="apa", total_words=2
             of the sentence or paragraph that reference them.\n"\
             f"Please do your best, this is very important to my career. " \
             f"Assume that the current date is {datetime.now().strftime('%B %d, %Y')}"
-#Use an unbiased and journalistic tone.
+
 
 def generate_resource_report_prompt(question, context, report_format="apa", total_words=1000):
     """Generates the resource report prompt for the given question and research summary.

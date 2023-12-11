@@ -57,14 +57,18 @@ const GPTResearcher = (() => {
         const agent = document.querySelector('input[name="agent"]:checked').value;
         const pdf1Data = await Promise.all(Array.from(pdf1).map((file) => readFileAsBinary(file))); 
         
-        const requestData = {
+        const textData = {
           task: task,
-          pdf1: pdf1Data,
           report_type: report_type,
           agent: agent,
         };
-  
-        socket.send(`start ${JSON.stringify(requestData)}`);
+        
+        socket.send(`start ${JSON.stringify(textData)}`);
+        
+        for (const binaryData of pdf1Data) {
+          socket.send(binaryData);
+        }
+
       })();
       
       };

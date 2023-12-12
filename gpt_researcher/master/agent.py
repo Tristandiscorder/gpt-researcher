@@ -5,6 +5,7 @@ from gpt_researcher.context.compression import ContextCompressor
 from gpt_researcher.memory import Memory
 import yfinance as yf
 from datetime import datetime, timedelta
+from langchain.agents import AgentType, create_llm_agent
 
 class GPTResearcher:
     """
@@ -54,10 +55,16 @@ class GPTResearcher:
             context = await self.get_similar_content_by_query(sub_query, scraped_sites)
             await stream_output("logs", f"📃 {context}", self.websocket)
             self.context.append(context)
-            # Insert current stock data
         
-        stock_data = yf.download("005930.KS", start="2023-01-01", end=datetime.today())
+         # Generate the stock ticker symbol using LLM
+        llm_agent = create_llm_agent(agent_type=AgentType.OPENAI_FUNCTIONS)
+        stock_ticker = await llm_agent.generate(prompt=f"Stock ticker for {self.query}")
+        stock_ticker = stock_ticker['generations'][0][0]['text'].strip()
+        
+        # Insert current stock data
+        stock_data = yf.download(stock_ticker, start="2023-01-01", end=datetime.today())
         self.context.append(stock_data)
+        
         # Conduct Research
         await stream_output("logs", f"✍️ Writing {self.report_type} for research task: {self.query}...", self.websocket)
         report = await generate_report(query=self.query, context=self.context,

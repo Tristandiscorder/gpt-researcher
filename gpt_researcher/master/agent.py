@@ -63,12 +63,12 @@ class GPTResearcher:
             self.context.append(context)
         
         # PDF loader
-        loader = PyPDFLoader("frontend/static/하나증권_에코프로.pdf")
-        pages = loader.load_and_split()
-        faiss_index = FAISS.from_documents(pages, OpenAIEmbeddings())
-        docs = faiss_index.similarity_search(self.query, k=4)
-        tagged_docs = {"tag": "docs", "data": docs}
-        self.context.append(tagged_docs)
+        #loader = PyPDFLoader("frontend/static/하나증권_에코프로.pdf")
+        #pages = loader.load_and_split()
+        #faiss_index = FAISS.from_documents(pages, OpenAIEmbeddings())
+        #docs = faiss_index.similarity_search(self.query, k=4)
+        #tagged_docs = {"tag": "docs", "data": docs}
+        #self.context.append(tagged_docs)
 
          # Generate the stock ticker symbol using LLM
         search = TavilySearchAPIWrapper()

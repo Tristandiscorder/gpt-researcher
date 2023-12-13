@@ -23,7 +23,7 @@ def generate_report_prompt(question, context, report_format="apa", total_words=2
     return f'Report format: 제발 반말 구어체의 한국말로 써줘! ~야, ~란다. ~몰랐지? ~라고 해 등으로 문장을 끝내줘.\
             Do not end sentence like ~다. because that is not colloquial\
            Information: """{context}"""\n\n' \
-           f'from the information above tagged as "docs", Please replicate the format of tagged docs as much as possible\
+           f'\
             Even so, do not forget to lose respect(반말구어체 사용) and use colloquial tone'\
            f'Using the above information, answer the following and always include data \
             excerpted from YAHOO FINANCE with the latest stock price, \

@@ -5,7 +5,11 @@ from gpt_researcher.context.compression import ContextCompressor
 from gpt_researcher.memory import Memory
 import yfinance as yf
 from datetime import datetime, timedelta
-from langchain.agents import AgentType, create_llm_agent
+from langchain.agents import AgentType, initialize_agent, Tool
+from langchain.tools.tavily_search import TavilySearchResults
+from langchain.utilities.tavily_search import TavilySearchAPIWrapper
+from langchain.chat_models import ChatOpenAI
+from requests.exceptions import HTTPError
 
 class GPTResearcher:
     """
@@ -43,7 +47,7 @@ class GPTResearcher:
         await stream_output("logs", self.agent, self.websocket)
 
         # Generate Sub-Queries including original query
-        sub_queries = await get_sub_queries(self.query, self.role, self.cfg) + [self.query]
+        sub_queries = await get_sub_queries(self.query, self.role, self.cfg)# + [self.query]
         await stream_output("logs",
                             f"🧠 I will conduct my research based on the following queries: {sub_queries}...",
                             self.websocket)
@@ -57,14 +61,29 @@ class GPTResearcher:
             self.context.append(context)
         
          # Generate the stock ticker symbol using LLM
-        llm_agent = create_llm_agent(agent_type=AgentType.OPENAI_FUNCTIONS)
-        stock_ticker = await llm_agent.generate(prompt=f"Stock ticker for {self.query}")
-        stock_ticker = stock_ticker['generations'][0][0]['text'].strip()
+        search = TavilySearchAPIWrapper()
+        tavily_tool = TavilySearchResults(api_wrapper=search, max_results=3)
+        tools = [Tool(
+                name="Search",
+                func=tavily_tool.run,
+                description="useful for getting ticker"
+            )
+        ]
+        llm = ChatOpenAI(model="gpt-4", temperature=0, openai_api_key="")
+        ticker_agent = initialize_agent(tools=tools,
+                          llm=llm,
+                          agent=AgentType.OPENAI_FUNCTIONS, verbose=True)
+        stock_ticker = ticker_agent.run(f'return me the stock ticker from {self.query}\
+                                        please return only TICKER(such as APPL for apple \
+                                        or 005930.KS for samsung electronics), NO STRINGS ATTACHED.\
+                                        do not include any quotes surrounding ticker because the\
+                                        returned ticker will be directly used as parameter for yf.download')
         
+
         # Insert current stock data
         stock_data = yf.download(stock_ticker, start="2023-01-01", end=datetime.today())
         self.context.append(stock_data)
-        
+
         # Conduct Research
         await stream_output("logs", f"✍️ Writing {self.report_type} for research task: {self.query}...", self.websocket)
         report = await generate_report(query=self.query, context=self.context,
@@ -100,7 +119,12 @@ class GPTResearcher:
         """
         # Get Urls
         retriever = self.retriever(sub_query)
-        search_results = retriever.search(max_results=self.cfg.max_search_results_per_query)
+        try:
+            search_results = retriever.search(max_results=self.cfg.max_search_results_per_query)
+        except HTTPError as e:
+            # Handle the 502 error
+            print("Error: Failed to retrieve search results. Skipping this part.")
+            search_results =[]
         new_search_urls = await self.get_new_urls([url.get("href") for url in search_results])
 
         # Scrape Urls

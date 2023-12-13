@@ -7,9 +7,10 @@ def generate_search_queries_prompt(question, max_iterations=5):
     Returns: str: The search queries prompt for the given question
     """
 
-    return f'Write {max_iterations} google search queries to search online that form an objective opinion from the following: "{question}"' \
+    return f'Write {max_iterations} google search queries to search online that form\
+          an objective opinion from the following: "{question}"' \
            f'Use the current date if needed: {datetime.now().strftime("%B %d, %Y")}.\n' \
-           f'You must respond with a list of strings in the following format: ["query 1", "query 2", "query 3"].'
+           f'You must respond with a list of strings in the following format: ["query 1", "query 2", "query 3","query 4","query 5"].'
 
 
 def generate_report_prompt(question, context, report_format="apa", total_words=2000):
@@ -19,11 +20,10 @@ def generate_report_prompt(question, context, report_format="apa", total_words=2
     Returns: str: The report prompt for the given question and research summary
     """
 
-    return f'Do not forget this is for KOREAN reader, thus to write in KOREAN!. \
-           "It is possible to use BANMAL! as if talking to students or your kids.\n" \
-           "Because korean investors are accustomed to talking of their investments in community like reddit."\
+    return f'제발 한국말로 써줘! 최대한 반말 구어체로 써주고 해체 또는 해라체로 써줘 ~야, ~란다. ~몰랐지? ~라고 해 등으로 써줘.\
            Information: """{context}"""\n\n' \
-           f'Using the above information, answer the following and always include data excerpted from yahoo finance latest stock price, \
+           f'Using the above information, answer the following and always include data \
+            excerpted from YAHOO FINANCE with the latest stock price, \
            its performance over the late 3month, 6months and over the current year 2023' \
            f' query or task: "{question}" in a detailed report --' \
            " The report should focus on the answer to the query, should be well structured, informative," \
@@ -39,8 +39,9 @@ def generate_report_prompt(question, context, report_format="apa", total_words=2
             relevant results that answer the query accurately. Place these citations at the end \
             of the sentence or paragraph that reference them.\n"\
             f"Please do your best, this is very important to my career. " \
+                f"Last but not the least, Don't forget to write in KOREAN. 제발 한국말로 말해줘 " \
             f"Assume that the current date is {datetime.now().strftime('%B %d, %Y')}"
-#Use an unbiased and journalistic tone.
+#Use 
 
 def generate_resource_report_prompt(question, context, report_format="apa", total_words=1000):
     """Generates the resource report prompt for the given question and research summary.

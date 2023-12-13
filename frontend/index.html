@@ -43,26 +43,25 @@
 <section class="landing">
     <div class="max-w-5xl mx-auto text-center">
         <h1 class="text-4xl font-extrabold mx-auto lg:text-7xl">
-            Say Goodbye to <br>
+            KAIST DFMBA Class of 2024 <br>
             <span
-                    style="background-image:linear-gradient(to right, #9867F0, #ED4E50); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Hours
-                    of Research</span>
+                    style="background-image:linear-gradient(to right, #9867F0, #ED4E50); 
+                    -webkit-background-clip: text;
+                     -webkit-text-fill-color: transparent;">이승국, 홍지민, 오태건, 권오람</span>
         </h1>
-        <p class="max-w-5xl mx-auto text-gray-600 mt-8" style="font-size:20px">
-            Say Hello to GPT Researcher, your AI mate for rapid insights and comprehensive research. GPT Researcher
-            takes care of everything from accurate source gathering to organization of research results - all in one
-            platform designed to make your research process a breeze.
+        <p class="max-w-5xl mx-auto text-gray-600 mt-8" style="font-size:30px">
+            당신만을 위한 주식 리포트 AI봇
         </p>
-        <a href="#form" class="btn btn-primary">Get Started</a>
+        <a href="#form" class="btn btn-primary">작성하러 ㄱㄱ</a>
     </div>
 </section>
 
 <main class="container" id="form">
-    <div class="agent-item"><img src="/static/defaultAgentAvatar.JPG" class="avatar"
+    <div class="agent-item"><img src="/static/kaist.JPG" class="avatar"
                                                 alt="Auto Agent"></div>
     <form method="POST" class="mt-3" onsubmit="GPTResearcher.startResearch(); return false;">
         <div class="form-group">
-            <label for="task" class="agent-question">What would you like me to research next?</label>
+            <label for="task" class="agent-question">어떤 주식에 대한 보고서를 써드릴까요 매수?중립?매도?</label>
             <input type="text" id="task" name="task" class="form-control" required>
             <input type="radio" name="agent" id="autoAgent" value="Auto Agent" checked hidden>
         </div>
@@ -74,7 +73,7 @@
             <button type="button" id="btnShowAuto" class="btn btn-secondary mt-3 btn-show">Auto Agent</button>
         </div>
         <div class="form-group">
-            <label for="report_type" class="agent-question">What type of report would you like me to generate?</label>
+            <label for="report_type" class="agent-question">어떤류의 보고서를 작성해드릴까요?</label>
             <select name="report_type" class="form-control" required>
                 <option value="research_report">Research Report</option>
                 <option value="resource_report">Resource Report</option>
@@ -86,8 +85,7 @@
 
     <div class="margin-div">
         <h2>Agent Output</h2>
-        <p class="mt-2 text-left" style="font-size: 0.8rem;">An agent tailored specifically to your task
-                        will be generated to provide the most precise and relevant research results.</p>
+        <p class="mt-2 text-left" style="font-size: 0.8rem;">당신만의 Agent가 대답해드립니다</p>
         <div id="output"></div>
     </div>
     <div class="margin-div">

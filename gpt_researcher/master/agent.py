@@ -3,6 +3,7 @@ from gpt_researcher.config import Config
 from gpt_researcher.master.functions import *
 from gpt_researcher.context.compression import ContextCompressor
 from gpt_researcher.memory import Memory
+from gpt_researcher.memory.embeddings import FAISS, OpenAIEmbeddings
 import yfinance as yf
 from datetime import datetime, timedelta
 from langchain.agents import AgentType, initialize_agent, Tool
@@ -10,6 +11,7 @@ from langchain.tools.tavily_search import TavilySearchResults
 from langchain.utilities.tavily_search import TavilySearchAPIWrapper
 from langchain.chat_models import ChatOpenAI
 from requests.exceptions import HTTPError
+from langchain.document_loaders import PyPDFLoader
 
 class GPTResearcher:
     """
@@ -60,9 +62,17 @@ class GPTResearcher:
             await stream_output("logs", f"📃 {context}", self.websocket)
             self.context.append(context)
         
+        # PDF loader
+        loader = PyPDFLoader("frontend/static/하나증권_에코프로.pdf")
+        pages = loader.load_and_split()
+        faiss_index = FAISS.from_documents(pages, OpenAIEmbeddings())
+        docs = faiss_index.similarity_search(self.query, k=4)
+        tagged_docs = {"tag": "docs", "data": docs}
+        self.context.append(tagged_docs)
+
          # Generate the stock ticker symbol using LLM
         search = TavilySearchAPIWrapper()
-        tavily_tool = TavilySearchResults(api_wrapper=search, max_results=3)
+        tavily_tool = TavilySearchResults(api_wrapper=search, max_results=5)
         tools = [Tool(
                 name="Search",
                 func=tavily_tool.run,

@@ -71,7 +71,7 @@ async def choose_agent(query, cfg):
         return "Default Agent", "You are an AI critical thinker research assistant. Your sole purpose is to write well written, critically acclaimed, objective and structured reports on given text."
 
 
-async def get_sub_queries(query, agent_role_prompt, cfg):
+async def get_sub_queries(query, report_format, agent_role_prompt, cfg):
     """
     Gets the sub queries
     Args:
@@ -88,7 +88,7 @@ async def get_sub_queries(query, agent_role_prompt, cfg):
         model=cfg.smart_llm_model,
         messages=[
             {"role": "system", "content": f"{agent_role_prompt}"},
-            {"role": "user", "content": generate_search_queries_prompt(query, max_iterations=max_research_iterations)}],
+            {"role": "user", "content": generate_search_queries_prompt(query, report_format,max_iterations=max_research_iterations)}],
         temperature=0,
         llm_provider=cfg.llm_provider
     )
@@ -193,12 +193,13 @@ async def summarize_url(query, raw_data, agent_role_prompt, cfg):
 
 
 
-async def generate_report(query, context, agent_role_prompt, report_type, websocket, cfg):
+async def generate_report(query, context, report_format, agent_role_prompt, report_type, websocket, cfg):
     """
     generates the final report
     Args:
         query:
         context:
+        report_format:
         agent_role_prompt:
         report_type:
         websocket:
@@ -215,7 +216,7 @@ async def generate_report(query, context, agent_role_prompt, report_type, websoc
             model=cfg.smart_llm_model,
             messages=[
                 {"role": "system", "content": f"{agent_role_prompt}"},
-                {"role": "user", "content": f"{generate_prompt(query, context, cfg.report_format, cfg.total_words)}"}],
+                {"role": "user", "content": f"{generate_prompt(query, context, report_format, cfg.total_words)}"}],
             temperature=0,
             llm_provider=cfg.llm_provider,
             stream=True,
@@ -243,3 +244,4 @@ async def stream_output(type, output, websocket=None, logging=True):
 
     if websocket:
         await websocket.send_json({"type": type, "output": output})
+

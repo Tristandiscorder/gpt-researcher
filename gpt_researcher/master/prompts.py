@@ -1,7 +1,7 @@
 from datetime import datetime
 
 
-def generate_search_queries_prompt(question, max_iterations=5):
+def generate_search_queries_prompt(question,report_format, max_iterations=5):
     """ Generates the search queries prompt for the given question.
     Args: question (str): The question to generate the search queries prompt for
     Returns: str: The search queries prompt for the given question
@@ -9,11 +9,15 @@ def generate_search_queries_prompt(question, max_iterations=5):
 
     return f'Write {max_iterations} google search queries to search online that form\
           an objective opinion from the following: "{question}"' \
+          f'in the respect that search should be able to answer by the common format: "{report_format}".'\
            f'Use the current date if needed: {datetime.now().strftime("%B %d, %Y")}.\n' \
-           f'You must respond with a list of strings in the following format: ["query 1", "query 2", "query 3","query 4","query 5"].'
+           f'You must respond with a list of strings in the following format: \
+            ["query 1", "query 2", "query 3","query 4","query 5"].'\
+           'But each query cannot be standalone relevent to report_format but always should be relevant to question'
+           
 
 
-def generate_report_prompt(question, context, report_format="apa", total_words=2000):
+def generate_report_prompt(question, context, report_format, total_words=2000):
     """ Generates the report prompt for the given question and research summary.
     Args: question (str): The question to generate the report prompt for
             research_summary (str): The research summary to generate the report prompt for
@@ -21,10 +25,10 @@ def generate_report_prompt(question, context, report_format="apa", total_words=2
     """
 
     return f'Report format: 제발 반말 구어체의 한국말로 써줘! ~야, ~란다. ~몰랐지? ~라고 해 등으로 문장을 끝내줘.\
-            Do not end sentence like ~다. because that is not colloquial\
-           Information: """{context}"""\n\n' \
-           f'\
-            Even so, do not forget to lose respect(반말구어체 사용) and use colloquial tone'\
+            Do not end sentence like ~다. because that is not colloquial'\
+            f'You MUST mimic the report format found by """{report_format}""" \
+                and better to make the table of content follows {report_format}.\n'\
+           f'Information: """{context}"""\n'\
            f'Using the above information, answer the following and always include data \
             excerpted from YAHOO FINANCE with the latest stock price, \
            its performance over the late 3month, 6months and over the current year 2023' \
@@ -37,7 +41,6 @@ def generate_report_prompt(question, context, report_format="apa", total_words=2
            "You MUST determine your own concrete and valid opinion based on the given information. \
             Do NOT deter to general and meaningless conclusions.\n" \
            f"You MUST write all used source urls at the end of the report as references, and make sure to not add duplicated sources, but only one reference for each.\n" \
-           f"You MUST write the report in {report_format} format.\n " \
             f"Cite search results using inline notations. Only cite the most \
             relevant results that answer the query accurately. Place these citations at the end \
             of the sentence or paragraph that reference them.\n"\
@@ -100,7 +103,7 @@ def auto_agent_instructions():
         task: "Write me a buy report for APPLE stock."
         response: 
         {
-            "server": "🤪 Greedy Analyst",
+            "server": "🤪 Greedy Analyst replicator",
             "agent_role_prompt: "You are a seasoned finance analyst AI assistant speicalized in writing BUY ratings report.\
                     That is you are good at stressing only positive parts of financial instruments asked by user thus to persuade readers to buy the stock.
                     Your primary goal is to compose comprehensive, astute, and methodically arranged financial reports \
@@ -109,7 +112,7 @@ def auto_agent_instructions():
         task: "Write me a hold report for APPLE stock."
         response: 
         { 
-            "server":  "🙏 Hold Analyst",
+            "server":  "🙏 Hold Analyst replicator",
             "agent_role_prompt": "You are a seasoned finance analyst AI assistant speicalized in writing HOLD ratings report.\
                     That is you are good at calming down worrisome users about the market\
                     and insinuating that each individual stock asked would cover the loss of potential readers' portfolio
@@ -119,8 +122,9 @@ def auto_agent_instructions():
         task: "Write me a sell report for APPLE stock."
         response:
         {
-            "server:  "💔 Sell Analyst",
-            "agent_role_prompt": "You are a seasoned finance analyst AI assistant speicalized in writing SELL ratings report.\
+            "server:  "💔 Sell Analyst replicator",
+            "agent_role_prompt": "You are a finance analyst AI speicalized in writing SELL ratings report.\
+            At the same time, you excel in replicating new searches into the given format.
                     Consider yourself no much different from Prof.Nouriel Roubini.\
                     That is you are good at pinpointing the worst part of each stock asked by user and pull users out from the stock market\
                     or go for short position on their portfolio about the stock

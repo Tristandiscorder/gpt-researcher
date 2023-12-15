@@ -1,4 +1,4 @@
-import time
+import time, os
 from gpt_researcher.config import Config
 from gpt_researcher.master.functions import *
 from gpt_researcher.context.compression import ContextCompressor
@@ -12,6 +12,11 @@ from langchain.utilities.tavily_search import TavilySearchAPIWrapper
 from langchain.chat_models import ChatOpenAI
 from requests.exceptions import HTTPError
 from langchain.document_loaders import PyPDFLoader
+from langchain.document_loaders import PyMuPDFLoader
+
+from PyPDF2 import PdfReader
+from langchain.text_splitter import CharacterTextSplitter
+from langchain.chains import RetrievalQA
 
 class GPTResearcher:
     """
@@ -36,20 +41,48 @@ class GPTResearcher:
         self.context = []
         self.memory = Memory()
         self.visited_urls = set()
-
+        self.dir_path= None
     async def run(self):
         """
         Runs the GPT Researcher
         Returns:
             Report
         """
+        # Insert document formats
+        print(f"🔎 귀사의 리포트 양식을 조사중에 있습니다")
+        dir_path = 'frontend/static/hana'
+        pdf_docs = await self.get_pdf_list(dir_path)
+        raw_text = await self.get_pdf_text(pdf_docs)
+        text_chunks = await self.get_text_chunks(raw_text)
+        vectorstore = await self.get_vectorstore(text_chunks)
+        llm_papers = await self.get_retriever_chain(vectorstore)
+
+        tools = [Tool(
+        name = "Document Store",
+        func = llm_papers.run,
+        description = "Useful to lookup information from documents given",
+#        handle_tool_error=True
+    ),
+]
+        llm = ChatOpenAI(model="gpt-4", temperature=0, openai_api_key="")
+        document_agent = initialize_agent(tools=tools,
+                  llm=llm,
+                  agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, verbose=True)
+
+        self.report_format=document_agent.run(f'please return me common features of documents uploaded in terms of layout, \
+                                              structure and contents-wise. this could be anything such as target price is a must,\
+                                               stock name is always followed by its ticker, it always mentions\
+                                              about the industry competition and so forth.\
+                                              Try YOUR BEST to get the result than deter to apologizing me for failing to do your job')
+
+        
         print(f"🔎 Running research for '{self.query}'...")
         # Generate Agent
         self.agent, self.role = await choose_agent(self.query, self.cfg)
         await stream_output("logs", self.agent, self.websocket)
 
         # Generate Sub-Queries including original query
-        sub_queries = await get_sub_queries(self.query, self.role, self.cfg)# + [self.query]
+        sub_queries = await get_sub_queries(self.query,self.report_format, self.role, self.cfg)
         await stream_output("logs",
                             f"🧠 I will conduct my research based on the following queries: {sub_queries}...",
                             self.websocket)
@@ -61,14 +94,6 @@ class GPTResearcher:
             context = await self.get_similar_content_by_query(sub_query, scraped_sites)
             await stream_output("logs", f"📃 {context}", self.websocket)
             self.context.append(context)
-        
-        # PDF loader
-        #loader = PyPDFLoader("frontend/static/하나증권_에코프로.pdf")
-        #pages = loader.load_and_split()
-        #faiss_index = FAISS.from_documents(pages, OpenAIEmbeddings())
-        #docs = faiss_index.similarity_search(self.query, k=4)
-        #tagged_docs = {"tag": "docs", "data": docs}
-        #self.context.append(tagged_docs)
 
          # Generate the stock ticker symbol using LLM
         search = TavilySearchAPIWrapper()
@@ -79,7 +104,7 @@ class GPTResearcher:
                 description="useful for getting ticker"
             )
         ]
-        llm = ChatOpenAI(model="gpt-4", temperature=0, openai_api_key="")
+        
         ticker_agent = initialize_agent(tools=tools,
                           llm=llm,
                           agent=AgentType.OPENAI_FUNCTIONS, verbose=True)
@@ -91,12 +116,14 @@ class GPTResearcher:
         
 
         # Insert current stock data
-        stock_data = yf.download(stock_ticker, start="2023-01-01", end=datetime.today())
+        stock_data = yf.download(stock_ticker, start="2022-01-01", end=datetime.today())
         self.context.append(stock_data)
+
+        
 
         # Conduct Research
         await stream_output("logs", f"✍️ Writing {self.report_type} for research task: {self.query}...", self.websocket)
-        report = await generate_report(query=self.query, context=self.context,
+        report = await generate_report(query=self.query, context=self.context, report_format=self.report_format,
                                        agent_role_prompt=self.role, report_type=self.report_type,
                                        websocket=self.websocket, cfg=self.cfg)
         time.sleep(2)
@@ -149,4 +176,48 @@ class GPTResearcher:
         context_compressor = ContextCompressor(documents=pages, embeddings=self.memory.get_embeddings())
         # Run Tasks
         return context_compressor.get_context(query, max_results=8)
+    
+    async def get_pdf_text(self, pdf_docs):
+        text = "" #init
+        for i in range(len(pdf_docs)):
+            doc_text = PyMuPDFLoader(pdf_docs[i]).load()
+            for j in range(len(doc_text)):
+                text += doc_text[j].page_content
+        print(text)
+        return text
 
+    
+    async def get_text_chunks(self,text):
+        text_splitter = CharacterTextSplitter(
+            separator="\n",
+            chunk_size=1000,
+            chunk_overlap=200,
+            length_function=len
+        )
+        chunks = text_splitter.split_text(text)
+        return chunks
+    
+    async def get_vectorstore(self, text_chunks):
+        embeddings = OpenAIEmbeddings()
+        vectorstore = FAISS.from_texts(texts=text_chunks, embedding=embeddings)
+        return vectorstore
+    
+    async def get_retriever_chain(self, vectorstore):
+        llm = ChatOpenAI()
+
+        retriever_chain= RetrievalQA.from_chain_type(
+            llm=llm,
+            chain_type="stuff",
+            retriever=vectorstore.as_retriever())
+        return retriever_chain
+
+    async def get_pdf_list(self, dir_path):
+        pdf_docs = []
+        for filename in os.listdir(dir_path):
+         # Check if the file is a PDF
+            if filename.endswith('.pdf'):
+                # Construct full file path
+                file_path = os.path.join(dir_path, filename)
+                pdf_docs.append(file_path)
+        
+        return pdf_docs
